@@ -169,6 +169,71 @@ const saveRecords = () => store.set('records', records);
 const saveDiet = () => store.set('dietEntries', dietEntries);
 const saveWater = () => store.set('waterMap', waterMap);
 
+/* ================= 云同步 ================= */
+// API 地址：同源优先（后端托管网页时），否则默认本地后端
+let auth = store.get('auth', null); // {token, username, apiBase}
+if (!auth || !auth.apiBase) {
+  const base = location.origin && location.origin.startsWith('http') && location.port === '3000'
+    ? location.origin : 'http://localhost:3000';
+  auth = { token: (auth && auth.token) || '', username: (auth && auth.username) || '', apiBase: base };
+  if (auth.token) store.set('auth', auth);
+}
+async function api(method, path, body) {
+  const res = await fetch(auth.apiBase + path, {
+    method,
+    headers: Object.assign({ 'Content-Type': 'application/json' }, auth.token ? { Authorization: 'Bearer ' + auth.token } : {}),
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return res.json();
+}
+function syncCollect() {
+  return { profile, records, dietEntries, waterMap, theme, v: 1 };
+}
+function syncApply(data) {
+  if (!data || typeof data !== 'object') return;
+  if (data.profile) { profile = Object.assign(profile, data.profile); saveProfile(); }
+  if (Array.isArray(data.records)) { records = data.records; saveRecords(); }
+  if (Array.isArray(data.dietEntries)) { dietEntries = data.dietEntries; saveDiet(); }
+  if (data.waterMap) { waterMap = data.waterMap; saveWater(); }
+  if (data.theme) { theme = data.theme; applyTheme(); }
+}
+async function cloudUpload() {
+  try {
+    toast('正在上传…');
+    const r = await api('PUT', '/api/data', syncCollect());
+    if (r.ok) { toast('已上传到云端 ☁️'); renderMine(); }
+    else toast(r.msg || '上传失败');
+  } catch (e) { toast('连接失败，请检查后端地址'); }
+}
+async function cloudDownload() {
+  try {
+    toast('正在恢复…');
+    const r = await api('GET', '/api/data');
+    if (r.ok) {
+      if (!r.data || Object.keys(r.data).length === 0) { toast('云端暂无数据'); return; }
+      syncApply(r.data); renderMine(); toast('已从云端恢复 ✅');
+    } else { auth.token = ''; store.set('auth', auth); renderMine(); toast(r.msg || '登录已过期，请重新登录'); }
+  } catch (e) { toast('连接失败，请检查后端地址'); }
+}
+async function doAuth(mode) {
+  const u = $('#authUser').value.trim(), p = $('#authPass').value;
+  if (!u || !p) { toast('请输入用户名和密码'); return; }
+  try {
+    const r = await api('POST', mode === 'reg' ? '/api/register' : '/api/login', { username: u, password: p });
+    if (r.ok) {
+      auth = { token: r.token, username: r.username, apiBase: auth.apiBase };
+      store.set('auth', auth); toast(mode === 'reg' ? '注册成功 🎉' : '登录成功，' + r.username);
+      renderMine();
+      // 登录后若本地无数据且云端有，自动恢复
+      if (records.length === 0 && dietEntries.length === 0) cloudDownload();
+    } else toast(r.msg || '操作失败');
+  } catch (e) { toast('连接失败，请检查后端地址'); }
+}
+function doLogout() {
+  auth = { token: '', username: '', apiBase: auth.apiBase };
+  store.set('auth', auth); toast('已退出登录'); renderMine();
+}
+
 /* ================= 主题 ================= */
 let theme = store.get('theme', 'auto'); // auto | light | dark
 const THEME_LABELS = { auto: '跟随系统', light: '浅色', dark: '深色' };
@@ -670,13 +735,33 @@ function renderMine() {
       <div class="goal-opts">${['auto', 'light', 'dark'].map(t => `<span class="chip ${theme === t ? 'active' : ''}" data-theme="${t}">${t === 'auto' ? '🌓' : t === 'dark' ? '🌙' : '☀️'} ${THEME_LABELS[t]}</span>`).join('')}</div>
       <p class="muted" style="margin-top:10px">当前：${theme === 'auto' ? (systemDark() ? '跟随系统（深色）' : '跟随系统（浅色）') : THEME_LABELS[theme]}</p>
     </div>
+    <div class="card">
+      <h3>账号与云同步</h3>
+      ${auth.token ? `
+        <p style="margin:4px 0 10px">👤 <b>${esc(auth.username)}</b> <span class="muted">· 已登录</span></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="chip" id="btnUp">☁️ 上传到云端</span>
+          <span class="chip" id="btnDown">⬇️ 从云端恢复</span>
+          <span class="chip" id="btnOut">退出登录</span>
+        </div>
+        <p class="muted" style="margin-top:10px">训练记录、饮食数据、身体档案将同步到服务器，换设备登录同一账号即可恢复。</p>
+      ` : `
+        <input id="authUser" placeholder="用户名（3-20位字母数字）" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:8px"/>
+        <input id="authPass" type="password" placeholder="密码（至少6位）" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px"/>
+        <div style="display:flex;gap:8px">
+          <span class="chip" id="btnLogin" style="flex:1;text-align:center">登录</span>
+          <span class="chip" id="btnReg" style="flex:1;text-align:center">注册新账号</span>
+        </div>
+        <p class="muted" style="margin-top:10px">注册后数据可云同步：换手机、换浏览器登录同一账号即可恢复全部记录。</p>
+      `}
+    </div>
     <div class="card"><h3>我的成就</h3>
       <div class="badges">${badges.map(b => `<div class="badge ${b.on ? 'on' : ''}"><i>${b.icon}</i><span>${b.name}</span></div>`).join('')}</div>
     </div>
     <div class="card">
       <h3>关于轻练</h3>
-      <p class="muted">轻练 · 合理健身网站版 v1.0</p>
-      <p class="muted" style="margin-top:4px">所有数据仅保存在本机浏览器中，不上传任何服务器。清除浏览器数据会清空记录，请注意备份。</p>
+      <p class="muted">轻练 · 合理健身网站版 v2.0</p>
+      <p class="muted" style="margin-top:4px">数据默认保存在本机浏览器；登录账号后可云同步到服务器，随时换设备恢复。</p>
     </div>
   `;
   $('#editNick').addEventListener('click', () => editField('昵称', 'nickname', 'text'));
@@ -688,6 +773,15 @@ function renderMine() {
     profile.goal = el.dataset.goal; saveProfile(); renderMine(); toast('目标已切换为 ' + profile.goal);
   }));
   $$('#app [data-theme]').forEach(el => el.addEventListener('click', () => { setTheme(el.dataset.theme); renderMine(); }));
+  if (auth.token) {
+    $('#btnUp').addEventListener('click', cloudUpload);
+    $('#btnDown').addEventListener('click', cloudDownload);
+    $('#btnOut').addEventListener('click', doLogout);
+  } else {
+    $('#btnLogin').addEventListener('click', () => doAuth('login'));
+    $('#btnReg').addEventListener('click', () => doAuth('reg'));
+    $('#authPass').addEventListener('keydown', e => { if (e.key === 'Enter') doAuth('login'); });
+  }
 }
 
 /* ================= 初始化 ================= */

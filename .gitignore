@@ -18,6 +18,9 @@ dist/
 qrcode.png
 avatar.png
 
+# 后端用户数据（不入库）
+backend/data/
+
 # 日志与系统文件
 *.log
 .DS_Store

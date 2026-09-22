@@ -1,0 +1,12 @@
+{
+  "name": "qinglian-backend",
+  "version": "1.0.0",
+  "description": "轻练健身后端服务：用户系统 + 训练/饮食数据云同步",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
