@@ -1,0 +1,37 @@
+@use '@/styles/variables.scss' as *;
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+}
+
+.desc {
+  margin-top: 4rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.action {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  padding: $spacing-xs $spacing-sm;
+  margin-right: -$spacing-sm;
+
+  &:active {
+    opacity: 0.7;
+  }
+}

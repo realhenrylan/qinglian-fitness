@@ -1,0 +1,61 @@
+@use '@/styles/compat.scss';
+@use '@/styles/variables.scss' as *;
+
+// 全局样式
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB',
+    sans-serif;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  background-color: $color-bg-page;
+}
+
+// ============================================
+// PC 宽屏适配（≥768px）
+// 大写 PX 防止 Taro pxtransform 转换
+// ============================================
+
+// 整体居中 + 阴影边框
+@media screen and (min-width: 768PX) {
+  .taro_page {
+    max-width: 480PX !important;
+    margin: 0 auto !important;
+    box-shadow: 0 0 40PX rgba(0, 0, 0, 0.08);
+    min-height: 100vh;
+    background: #f5f8f6;
+    padding-bottom: 60PX;
+  }
+}
+
+@media screen and (min-width: 1024PX) {
+  .taro_page {
+    max-width: 560PX !important;
+  }
+}
+
+// 底部 TabBar 居中对齐
+@media screen and (min-width: 768PX) {
+  .taro-tabbar__container {
+    max-width: 480PX !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    width: 100% !important;
+    border-top: 1PX solid #e8edea;
+    box-shadow: 0 -4PX 16PX rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media screen and (min-width: 1024PX) {
+  .taro-tabbar__container {
+    max-width: 560PX !important;
+  }
+}
+
+// body 装饰背景
+@media screen and (min-width: 768PX) {
+  body {
+    background: linear-gradient(135deg, #e8f5ee 0%, #f0f5ff 50%, #fff5e8 100%);
+  }
+}

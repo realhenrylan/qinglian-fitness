@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+.swc/
+
+# 敏感凭证（微信小程序上传私钥、AppID 等）—— 严禁上传
+.auth/
+*.key
+
+# IDE / 工具缓存
+.pai/
+.vscode/
+.idea/
+
+# 预览生成的临时资源
+qrcode.png
+avatar.png
+
+# 日志与系统文件
+*.log
+.DS_Store
+Thumbs.db
+
+# 环境变量
+.env
+.env.local

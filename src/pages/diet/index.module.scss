@@ -1,0 +1,320 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: $spacing-md $page-padding $spacing-xl;
+}
+
+.pageTitle {
+  display: block;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.pageDesc {
+  margin-top: 8rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+// 今日热量渐变卡
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-md;
+  padding: $spacing-lg;
+  background: $color-primary-gradient;
+  border-radius: $radius-xl;
+}
+
+.heroLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.heroLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.heroNum {
+  margin-top: 4rpx;
+  font-size: 72rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.heroUnit {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.heroTarget {
+  margin-top: 8rpx;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ringNum {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: 1.1;
+}
+
+.ringLabel {
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+// 剩余额度行
+.budgetRow {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.budgetIcon {
+  margin-right: $spacing-sm;
+  font-size: $font-size-md;
+}
+
+.budgetText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.budgetNum {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.budgetOver {
+  color: $color-error;
+}
+
+// 通用白卡
+.card {
+  margin-top: $spacing-md;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.cardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+// 营养素进度
+.nutriRow {
+  margin-top: $spacing-lg;
+
+  &:first-of-type {
+    margin-top: $spacing-md;
+  }
+}
+
+.nutriHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nutriName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.nutriValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-variant-numeric: tabular-nums;
+}
+
+.nutriValueTarget {
+  color: $color-text-tertiary;
+}
+
+.nutriBar {
+  height: 12rpx;
+  margin-top: $spacing-xs;
+  overflow: hidden;
+  background: $color-divider;
+  border-radius: $radius-round;
+}
+
+.nutriBarInner {
+  height: 100%;
+  border-radius: $radius-round;
+}
+
+.nutriBarProtein {
+  background: $color-primary-gradient;
+}
+
+.nutriBarCarb {
+  background: linear-gradient(135deg, #4a90ff, #2f6fed);
+}
+
+.nutriBarFat {
+  background: $color-accent-gradient;
+}
+
+// 四餐
+.meal {
+  padding: $spacing-md 0;
+  border-bottom: 2rpx solid $color-divider;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.mealHead {
+  display: flex;
+  align-items: center;
+}
+
+.mealIcon {
+  font-size: $font-size-lg;
+}
+
+.mealName {
+  margin-left: $spacing-sm;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.mealKcal {
+  margin-left: $spacing-sm;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.mealAdd {
+  @include flex-center;
+  width: 56rpx;
+  height: 56rpx;
+  margin-left: auto;
+  font-size: $font-size-lg;
+  color: $color-primary;
+  background: $color-tag-shape;
+  border-radius: $radius-round;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.entryList {
+  margin-top: $spacing-sm;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  padding: $spacing-xs 0;
+}
+
+.entryDot {
+  width: 10rpx;
+  height: 10rpx;
+  margin: 0 $spacing-sm 0 $spacing-xs;
+  border-radius: $radius-round;
+  background: $color-primary-light;
+}
+
+.entryName {
+  flex: 1;
+  min-width: 0;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.entryKcal {
+  margin-left: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.entryDel {
+  padding: $spacing-xs $spacing-xs $spacing-xs $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-disabled;
+}
+
+.mealEmpty {
+  margin: $spacing-sm 0 0 $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}
+
+// 饮水
+.waterCups {
+  display: flex;
+  justify-content: space-between;
+  margin-top: $spacing-md;
+}
+
+.cup {
+  font-size: 44rpx;
+  opacity: 0.35;
+  filter: grayscale(1);
+
+  &:active {
+    transform: scale(1.15);
+  }
+}
+
+.cupFilled {
+  opacity: 1;
+  filter: none;
+}
+
+.waterText {
+  margin-top: $spacing-sm;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+// 小贴士
+.tipsCard {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-md $spacing-lg;
+  background: $color-tag-fat;
+  border-radius: $radius-lg;
+}
+
+.tipsIcon {
+  margin-right: $spacing-sm;
+  font-size: $font-size-md;
+}
+
+.tipsText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-tag-fat-text;
+  line-height: $line-height-normal;
+}

@@ -1,0 +1,289 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: $spacing-md $page-padding $spacing-xl;
+}
+
+.pageTitle {
+  display: block;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+// 本周概览渐变卡
+.overview {
+  display: flex;
+  margin-top: $spacing-md;
+  padding: $spacing-lg 0;
+  background: $color-primary-gradient;
+  border-radius: $radius-xl;
+}
+
+.overviewItem {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+}
+
+.overviewNum {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.overviewLabel {
+  margin-top: 8rpx;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+// 连续打卡卡
+.streakCard {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-md;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.streakIcon {
+  font-size: 56rpx;
+}
+
+.streakInfo {
+  flex: 1;
+  margin-left: $spacing-md;
+}
+
+.streakNum {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.streakText {
+  margin-top: 4rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.streakBar {
+  height: 12rpx;
+  margin-top: $spacing-sm;
+  overflow: hidden;
+  background: $color-divider;
+  border-radius: $radius-round;
+}
+
+.streakBarInner {
+  height: 100%;
+  background: $color-accent-gradient;
+  border-radius: $radius-round;
+}
+
+// 柱状图
+.card {
+  margin-top: $spacing-md;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.cardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 280rpx;
+  margin-top: $spacing-lg;
+}
+
+.barCol {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 32rpx;
+  background: $color-primary-light;
+  border-radius: $radius-sm $radius-sm 0 0;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.barToday {
+  background: $color-primary-gradient;
+}
+
+.barLabel {
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.barLabelToday {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+// 日历
+.calHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calArrow {
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+
+  &:active {
+    opacity: 0.5;
+  }
+}
+
+.calMonth {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.calWeek {
+  display: flex;
+  margin-top: $spacing-md;
+}
+
+.calWeekLabel {
+  flex: 1;
+  text-align: center;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.calGrid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: $spacing-xs;
+}
+
+.calCell {
+  @include flex-center;
+  width: calc(100% / 7);
+  height: 80rpx;
+}
+
+.calDay {
+  @include flex-center;
+  width: 64rpx;
+  height: 64rpx;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.calDayToday {
+  border: 2rpx solid $color-primary;
+  border-radius: $radius-round;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.calDot {
+  position: relative;
+}
+
+.calDot::after {
+  content: '';
+  position: absolute;
+  bottom: 6rpx;
+  left: 50%;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  transform: translateX(-50%);
+}
+
+// 历史记录
+.recordList {
+  margin-top: $spacing-md;
+}
+
+.recordItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 2rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.recordIcon {
+  @include flex-center;
+  width: 72rpx;
+  height: 72rpx;
+  margin-right: $spacing-md;
+  font-size: 32rpx;
+  background: $color-tag-shape;
+  border-radius: $radius-md;
+}
+
+.recordInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.recordTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.recordMeta {
+  margin-top: 4rpx;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.recordDel {
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.empty {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-xl 0;
+}
+
+.emptyIcon {
+  font-size: 72rpx;
+}
+
+.emptyText {
+  margin-top: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

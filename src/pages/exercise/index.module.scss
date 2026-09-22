@@ -1,0 +1,76 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: $spacing-md $page-padding $spacing-xl;
+}
+
+.pageTitle {
+  display: block;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.pageDesc {
+  margin-top: 8rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.chipScroll {
+  @include scroll-x-container;
+  margin: $spacing-md -$page-padding 0;
+  padding: 4rpx $page-padding;
+}
+
+.chip {
+  @include scroll-x-item(auto);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: $button-height-sm;
+  margin-right: $spacing-sm;
+  padding: 0 $spacing-lg;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  box-shadow: $shadow-card;
+  white-space: nowrap;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.chipActive {
+  color: $color-text-white;
+  background: $color-primary-gradient;
+}
+
+.exerciseList {
+  display: flex;
+  flex-direction: column;
+  margin-top: $spacing-lg;
+}
+
+.exerciseItem {
+  margin-bottom: $spacing-md;
+}
+
+.empty {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-xl * 2 0;
+}
+
+.emptyIcon {
+  font-size: 72rpx;
+}
+
+.emptyText {
+  margin-top: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

@@ -1,0 +1,320 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: $spacing-xl;
+}
+
+// 顶部渐变区
+.hero {
+  padding: 108rpx $page-padding 88rpx;
+  background: $color-primary-gradient;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.greeting {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.dateText {
+  margin-top: 8rpx;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.6);
+  border-radius: $radius-round;
+  background: $color-divider;
+}
+
+// 本周数据卡（悬浮重叠）
+.weekCard {
+  display: flex;
+  align-items: center;
+  margin: -56rpx $page-padding 0;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.ringValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  line-height: 1.1;
+}
+
+.ringUnit {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.weekStats {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-left: $spacing-lg;
+}
+
+.weekTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.weekRow {
+  display: flex;
+  margin-top: $spacing-sm;
+}
+
+.weekItem {
+  display: flex;
+  flex-direction: column;
+  margin-right: $spacing-xl;
+}
+
+.weekNum {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.weekLabel {
+  margin-top: 2rpx;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+// 通用 section
+.section {
+  margin-top: $spacing-xl;
+  padding: 0 $page-padding;
+}
+
+// 今日推荐
+.todayCard {
+  overflow: hidden;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.todayCoverWrap {
+  position: relative;
+  height: 280rpx;
+}
+
+.todayCover {
+  width: 100%;
+  height: 280rpx;
+  background: $color-divider;
+}
+
+.todayMask {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: $spacing-lg $spacing-lg $spacing-md;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.todayTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.todayTags {
+  display: flex;
+  margin-top: 8rpx;
+}
+
+.todayTag {
+  margin-right: $spacing-xs;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.todayBody {
+  padding: $spacing-lg;
+}
+
+.todayDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+}
+
+.todayMeta {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-md;
+}
+
+.todayMetaItem {
+  display: flex;
+  align-items: center;
+  margin-right: $spacing-lg;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.todayMetaDot {
+  width: 12rpx;
+  height: 12rpx;
+  margin-right: 8rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+}
+
+.todayMetaDotOrange {
+  background: $color-accent;
+}
+
+.startBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  margin-top: $spacing-lg;
+  font-size: $font-size-lg;
+  color: $color-text-white;
+  background: $color-primary-gradient;
+  border-radius: $radius-button;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+// 快捷入口
+.quickGrid {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-lg 0;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.quickItem {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.quickIcon {
+  @include flex-center;
+  width: 88rpx;
+  height: 88rpx;
+  font-size: 40rpx;
+  border-radius: $radius-lg;
+}
+
+.quickIconGreen {
+  background: $color-tag-shape;
+}
+
+.quickIconBlue {
+  background: $color-tag-muscle;
+}
+
+.quickIconOrange {
+  background: $color-tag-fat;
+}
+
+.quickIconPurple {
+  background: $color-tag-begin;
+}
+
+.quickLabel {
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+// 横向推荐
+.planScroll {
+  @include scroll-x-container;
+  margin: 0 -$page-padding;
+  padding: 4rpx $page-padding;
+}
+
+.planSlide {
+  @include scroll-x-item(280rpx);
+  display: inline-flex;
+  flex-direction: column;
+  margin-right: $spacing-md;
+  overflow: hidden;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.planSlideCover {
+  width: 280rpx;
+  height: 168rpx;
+  background: $color-divider;
+}
+
+.planSlideBody {
+  padding: $spacing-sm $spacing-md $spacing-md;
+}
+
+.planSlideTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.planSlideMeta {
+  margin-top: 8rpx;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+// 小贴士
+.tipsCard {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-md $spacing-lg;
+  background: $color-tag-shape;
+  border-radius: $radius-lg;
+}
+
+.tipsIcon {
+  margin-right: $spacing-sm;
+  font-size: $font-size-md;
+}
+
+.tipsText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-primary-dark;
+  line-height: $line-height-normal;
+}

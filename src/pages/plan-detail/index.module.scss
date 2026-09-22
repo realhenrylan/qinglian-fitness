@@ -1,0 +1,25 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 $page-padding;
+}
+
+.icon {
+  font-size: 96rpx;
+}
+
+.title {
+  margin-top: $spacing-lg;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.tip {
+  margin-top: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

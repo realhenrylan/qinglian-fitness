@@ -1,0 +1,45 @@
+// ============================================
+// 主题配色变量（轻练 · 合理健身）
+// ============================================
+
+// 品牌主题色：活力健康绿
+$color-primary: #00b578;
+$color-primary-light: #36c99a;
+$color-primary-dark: #00905f;
+
+// 功能色
+$color-success: #00b42a;
+$color-warning: #ff7d00;
+$color-error: #f53f3f;
+$color-info: #165dff;
+
+// 背景色
+$color-bg-page: #f5f8f6;
+$color-bg-card: #ffffff;
+$color-bg-hover: #eef5f1;
+
+// 文本色
+$color-text-primary: #1d2129;
+$color-text-secondary: #4e5969;
+$color-text-tertiary: #86909c;
+$color-text-disabled: #c9cdd4;
+$color-text-white: #ffffff;
+
+// 边框色
+$color-border: #e8edea;
+$color-divider: #f0f3f1;
+
+// 业务扩展色
+$color-accent: #ff7d00; // 热力橙：耗能 / 连续打卡
+$color-primary-gradient: linear-gradient(135deg, #00b578 0%, #36c99a 100%);
+$color-accent-gradient: linear-gradient(135deg, #ff9a2e 0%, #ff7d00 100%);
+
+// 标签底色
+$color-tag-fat: #fff1e8;       // 减脂
+$color-tag-fat-text: #ff7d00;
+$color-tag-muscle: #e8f3ff;    // 增肌
+$color-tag-muscle-text: #165dff;
+$color-tag-shape: #e9fbf4;     // 塑形
+$color-tag-shape-text: #00905f;
+$color-tag-begin: #f5f0ff;     // 入门
+$color-tag-begin-text: #7a3df0;

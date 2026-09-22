@@ -1,0 +1,224 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: $spacing-md $page-padding 200rpx;
+}
+
+// 计划信息卡
+.planCard {
+  padding: $spacing-lg;
+  background: $color-primary-gradient;
+  border-radius: $radius-xl;
+}
+
+.planTitle {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.planMeta {
+  display: flex;
+  margin-top: $spacing-sm;
+}
+
+.planMetaItem {
+  margin-right: $spacing-lg;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+// 计时器卡
+.timerCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-md;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+.timerLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.timerLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.timerValue {
+  margin-top: 4rpx;
+  font-size: 56rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  font-variant-numeric: tabular-nums;
+}
+
+.timerBtns {
+  display: flex;
+}
+
+.timerBtn {
+  @include button-reset;
+  height: $button-height-md;
+  margin-left: $spacing-sm;
+  padding: 0 $spacing-lg;
+  font-size: $font-size-sm;
+  border-radius: $radius-button;
+}
+
+.timerPause {
+  color: $color-text-white;
+  background: $color-primary;
+}
+
+.timerResume {
+  color: $color-text-white;
+  background: $color-accent;
+}
+
+.timerReset {
+  color: $color-text-secondary;
+  background: $color-bg-hover;
+}
+
+// 热身提示
+.warmup {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: $color-tag-fat;
+  border-radius: $radius-lg;
+}
+
+.warmupIcon {
+  margin-right: $spacing-sm;
+}
+
+.warmupText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-tag-fat-text;
+  line-height: $line-height-normal;
+}
+
+// 动作清单
+.listCard {
+  margin-top: $spacing-xl;
+}
+
+.listTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.exerciseItem {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.checkbox {
+  @include flex-center;
+  width: 56rpx;
+  height: 56rpx;
+  margin-right: $spacing-md;
+  font-size: $font-size-sm;
+  color: transparent;
+  border: 3rpx solid $color-border;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.checkboxChecked {
+  color: $color-text-white;
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.exerciseInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.exerciseName {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.exerciseMeta {
+  margin-top: 4rpx;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.exerciseDone {
+  color: $color-text-disabled;
+  text-decoration: line-through;
+}
+
+.restTip {
+  margin-top: $spacing-sm;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+// 底部固定操作栏
+.bottomBar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + constant(safe-area-inset-bottom));
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: $shadow-float;
+}
+
+.progressText {
+  margin-bottom: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: center;
+}
+
+.finishBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  font-size: $font-size-lg;
+  color: $color-text-white;
+  background: $color-primary-gradient;
+  border-radius: $radius-button;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+.finishBtnDisabled {
+  background: $color-text-disabled;
+}
