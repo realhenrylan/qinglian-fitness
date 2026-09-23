@@ -188,7 +188,8 @@ async function api(method, path, body) {
     auth = { token: '', username: '', apiBase: auth.apiBase };
     store.set('auth', auth);
     toast('登录已过期，请重新登录');
-    renderMine();
+    if (typeof showLoginGate === 'function') showLoginGate();
+    if (typeof renderMine === 'function') renderMine();
     return { ok: false, msg: '未登录' };
   }
   return res.json();
@@ -801,4 +802,85 @@ function renderMine() {
 /* ================= 初始化 ================= */
 applyTheme();
 $$('#tabbar a').forEach(a => a.addEventListener('click', () => showTab(a.dataset.tab)));
-showTab('home');
+
+// 登录门控：未登录时显示登录界面，登录后才进入应用
+function showLoginGate() {
+  const gate = $('#loginGate');
+  if (!gate) return;
+  gate.style.display = 'flex';
+  $('#app').style.visibility = 'hidden';
+  $('#tabbar').style.display = 'none';
+  // 绑定事件（只绑一次）
+  if (!gate._bound) {
+    gate._bound = true;
+    $('#gateLoginBtn').addEventListener('click', () => gateAuth('login'));
+    $('#gateRegBtn').addEventListener('click', () => gateAuth('reg'));
+    $('#gatePass').addEventListener('keydown', e => { if (e.key === 'Enter') gateAuth('login'); });
+  }
+}
+function hideLoginGate() {
+  const gate = $('#loginGate');
+  if (!gate) return;
+  gate.style.display = 'none';
+  $('#app').style.visibility = '';
+  $('#tabbar').style.display = '';
+}
+async function gateAuth(mode) {
+  const u = ($('#gateUser').value || '').trim(), p = $('#gatePass').value || '';
+  if (!u || !p) { toast('请输入用户名和密码'); return; }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(u)) { toast('用户名需3-20位字母/数字/下划线'); return; }
+  if (p.length < 6) { toast('密码至少6位'); return; }
+  const loginBtn = $('#gateLoginBtn'), regBtn = $('#gateRegBtn');
+  loginBtn.disabled = regBtn.disabled = true;
+  loginBtn.textContent = '请稍候…';
+  try {
+    const r = await api('POST', mode === 'reg' ? '/api/register' : '/api/login', { username: u, password: p });
+    if (r.ok) {
+      auth = { token: r.token, username: r.username, apiBase: auth.apiBase };
+      store.set('auth', auth);
+      toast(mode === 'reg' ? '注册成功 🎉' : '欢迎回来，' + r.username);
+      hideLoginGate();
+      // 登录后若本地无数据且云端有，自动恢复
+      if (records.length === 0 && dietEntries.length === 0) cloudDownload();
+      showTab('home');
+    } else {
+      toast(r.msg || '操作失败');
+    }
+  } catch (e) { toast('网络连接失败，请检查网络'); }
+  finally { loginBtn.disabled = regBtn.disabled = false; loginBtn.textContent = '登录'; }
+}
+// 退出登录时重新显示门控
+const _origLogout = doLogout;
+doLogout = function() { _origLogout(); showLoginGate(); $('#gateUser').value = ''; $('#gatePass').value = ''; };
+// 401 自动登出时也显示门控
+const _origApi = api;
+
+// 启动检查：有 token 则验证，无 token 直接显示登录
+async function initApp() {
+  if (auth.token) {
+    // 验证 token 是否有效
+    try {
+      const r = await api('GET', '/api/data');
+      if (r.ok) {
+        // token 有效，如果有云端数据且本地为空，自动恢复
+        if (r.data && Object.keys(r.data).length > 0 && records.length === 0 && dietEntries.length === 0) {
+          syncApply(r.data);
+        }
+        showTab('home');
+      } else {
+        showLoginGate();
+      }
+    } catch (e) {
+      // 网络失败但本地有数据，允许离线使用
+      if (records.length > 0 || dietEntries.length > 0 || Object.keys(profile).length > 1) {
+        toast('离线模式 · 数据将在联网后同步');
+        showTab('home');
+      } else {
+        showLoginGate();
+      }
+    }
+  } else {
+    showLoginGate();
+  }
+}
+initApp();
