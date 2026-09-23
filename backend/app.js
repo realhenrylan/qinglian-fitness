@@ -20,11 +20,28 @@ const USER_DATA_DIR = path.join(DATA_DIR, 'userdata');
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
+// Same-origin is the default; cross-origin clients must be explicitly allowlisted.
+const corsAllowedOrigins = new Set((process.env.CORS_ALLOWED_ORIGINS || '')
+  .split(',').map(origin => origin.trim()).filter(Boolean));
+function isAllowedOrigin(origin, req) {
+  if (corsAllowedOrigins.has(origin)) return true;
+  const host = req.headers.host || '';
+  const protocol = String(req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim();
+  return Boolean(host) && origin === `${protocol}://${host}`;
+}
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  const origin = req.headers.origin;
+  const allowedOrigin = origin && isAllowedOrigin(origin, req);
+  if (allowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+  if (req.method === 'OPTIONS') {
+    if (origin && !allowedOrigin) return res.sendStatus(403);
+    return res.sendStatus(204);
+  }
   next();
 });
 
