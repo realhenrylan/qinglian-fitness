@@ -1,5 +1,5 @@
 /* 轻练 Service Worker：缓存优先，支持离线使用 */
-const CACHE = 'qinglian-v2';
+const CACHE = 'qinglian-v3';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (e) => {
