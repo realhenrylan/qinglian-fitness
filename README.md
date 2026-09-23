@@ -57,6 +57,8 @@ cd website && npx serve .
 # → http://localhost:3000（同源，API 直连后端）
 ```
 
+Netlify Functions 必须在 Netlify 环境变量中配置 `DATABASE_URL`，并确保变量 scope 包含 Functions；未配置时 API 函数会拒绝启动，避免把临时文件存储误当作持久数据库。本地运行 `backend/server.js` 仍可使用文件模式。
+
 后端默认只允许同源 API 请求。如果网站和 API 使用不同来源（例如分开运行的本地预览），请在后端设置 `CORS_ALLOWED_ORIGINS`，填入需要允许的完整来源；多个来源用逗号分隔，例如 `https://example.com,https://preview.example.com`。不要在列表中加入路径或末尾斜杠。
 
 ## API 接口
