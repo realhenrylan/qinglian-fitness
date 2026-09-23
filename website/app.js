@@ -159,7 +159,8 @@ const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem('ql_' + k)); return v === null || v === undefined ? d : v; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('ql_' + k, JSON.stringify(v)); } catch (e) { console.error('[Store] 保存失败', k, e); } }
 };
-let profile = Object.assign({ nickname: '健身新人', gender: '男', age: 25, goal: '入门', height: 175, weight: 70, targetWeight: 65 }, store.get('profile', {}));
+const DEFAULT_PROFILE = Object.freeze({ nickname: '健身新人', gender: '男', age: 25, goal: '入门', height: 175, weight: 70, targetWeight: 65 });
+let profile = Object.assign({}, DEFAULT_PROFILE, store.get('profile', {}));
 let records = store.get('records', []);
 let dietEntries = store.get('dietEntries', []);
 let waterMap = store.get('waterMap', {});
@@ -168,6 +169,17 @@ const saveProfile = () => store.set('profile', profile);
 const saveRecords = () => store.set('records', records);
 const saveDiet = () => store.set('dietEntries', dietEntries);
 const saveWater = () => store.set('waterMap', waterMap);
+
+function clearAccountData() {
+  profile = Object.assign({}, DEFAULT_PROFILE);
+  records = [];
+  dietEntries = [];
+  waterMap = {};
+  saveProfile();
+  saveRecords();
+  saveDiet();
+  saveWater();
+}
 
 /* ================= 云同步 ================= */
 // API 地址：同源优先（后端托管网页时），否则默认本地后端
@@ -187,6 +199,7 @@ async function api(method, path, body) {
   if (res.status === 401 && auth.token) {
     auth = { token: '', username: '', apiBase: auth.apiBase };
     store.set('auth', auth);
+    clearAccountData();
     toast('登录已过期，请重新登录');
     if (typeof showLoginGate === 'function') showLoginGate();
     if (typeof renderMine === 'function') renderMine();
@@ -246,7 +259,9 @@ async function doAuth(mode) {
 }
 function doLogout() {
   auth = { token: '', username: '', apiBase: auth.apiBase };
-  store.set('auth', auth); toast('已退出登录'); renderMine();
+  store.set('auth', auth);
+  clearAccountData();
+  toast('已退出登录'); renderMine();
 }
 
 /* ================= 主题 ================= */
