@@ -10,7 +10,7 @@ const USE_PG = !!process.env.DATABASE_URL;
 let pool = null;
 if (USE_PG) {
   const { Pool } = require('pg');
-  pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+  pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: true } });
 }
 
 const DATA_DIR = path.join(__dirname, 'data');
