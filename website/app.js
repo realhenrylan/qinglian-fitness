@@ -395,7 +395,7 @@ function renderHome() {
     <div class="hero">
       <div>
         <div class="label">本周已消耗</div>
-        <div class="big">${weekKcal}<small> 千卡</small></div>
+        <div class="big">${esc(weekKcal)}<small> 千卡</small></div>
         <div class="label" style="margin-top:4px">目标 ${esc(profile.goal)} · ${GOAL_TIPS[profile.goal] || ''}</div>
       </div>
       <div class="ring-wrap">${ring(pct, '#ffffff', 'rgba(255,255,255,.28)')}
@@ -404,9 +404,9 @@ function renderHome() {
     </div>
     <div class="grid-stats">
       <div class="gs"><b>${weekCount}</b><span>本周训练</span></div>
-      <div class="gs"><b>${records.reduce((s, r) => s + r.minutes, 0)}</b><span>总分钟</span></div>
+      <div class="gs"><b>${esc(records.reduce((s, r) => s + r.minutes, 0))}</b><span>总分钟</span></div>
       <div class="gs"><b>${records.length}</b><span>总次数</span></div>
-      <div class="gs"><b>${records.reduce((s, r) => s + r.kcal, 0)}</b><span>总千卡</span></div>
+      <div class="gs"><b>${esc(records.reduce((s, r) => s + r.kcal, 0))}</b><span>总千卡</span></div>
     </div>
     <div class="section-title"><h2>今日推荐</h2><a data-nav="plan">更多 ›</a></div>
     ${recommendPlan()}
@@ -583,9 +583,9 @@ function renderDiet() {
           </div>
           ${ml.length ? ml.map(e => `
             <div class="entry"><span class="dot"></span>
-              <span class="en">${esc(e.foodName)} ×${e.servings}</span>
+              <span class="en">${esc(e.foodName)} ×${esc(e.servings)}</span>
               <span class="ek">${Math.round(e.kcal * e.servings)} 千卡</span>
-              <span class="del" data-del="${e.id}">删除</span>
+              <span class="del" data-del="${esc(e.id)}">删除</span>
             </div>`).join('') : `<p class="muted" style="padding:6px 0 0 4px">点击 ＋ 记录${m}</p>`}
         </div>`;
       }).join('')}
@@ -593,7 +593,7 @@ function renderDiet() {
     <div class="card">
       <h3>每日饮水（目标 8 杯）</h3>
       <div class="water-cups">${Array.from({ length: 8 }, (_, i) => `<span class="${i < cups ? 'on' : ''}" data-cup="${i}">💧</span>`).join('')}</div>
-      <p class="muted" style="text-align:center">已喝 ${cups}/8 杯 · 少量多次更健康</p>
+      <p class="muted" style="text-align:center">已喝 ${esc(cups)}/8 杯 · 少量多次更健康</p>
     </div>
     <div class="tips"><span>🥗</span><p>每餐一拳主食、一掌优质蛋白、两拳蔬菜；减脂期缺口 300-500 千卡更可持续。</p></div>
   `;
@@ -685,8 +685,8 @@ function renderStats() {
     <div class="page-head"><h1>训练数据</h1><p>坚持是最大的天赋 · 已记录 ${records.length} 次训练</p></div>
     <div class="grid-stats">
       <div class="gs"><b>${records.length}</b><span>总次数</span></div>
-      <div class="gs"><b>${records.reduce((s, r) => s + r.minutes, 0)}</b><span>总分钟</span></div>
-      <div class="gs"><b>${records.reduce((s, r) => s + r.kcal, 0)}</b><span>总千卡</span></div>
+      <div class="gs"><b>${esc(records.reduce((s, r) => s + r.minutes, 0))}</b><span>总分钟</span></div>
+      <div class="gs"><b>${esc(records.reduce((s, r) => s + r.kcal, 0))}</b><span>总千卡</span></div>
     </div>
     <div class="streak-row" style="margin-top:12px">
       <div class="st"><b>${streak}</b><span>连续打卡（天）</span></div>
@@ -694,16 +694,16 @@ function renderStats() {
     </div>
     <div class="card"><h3>近 7 天耗能</h3>
       <div class="chart">${weekData.map(x => `
-        <div class="col"><i style="height:${Math.round(x.kcal / maxK * 88)}%" title="${x.kcal}"></i><em>${x.d.slice(5).replace('-', '/')}</em></div>`).join('')}
+        <div class="col"><i style="height:${Math.round(x.kcal / maxK * 88)}%" title="${esc(x.kcal)}"></i><em>${x.d.slice(5).replace('-', '/')}</em></div>`).join('')}
       </div>
     </div>
     <div class="card"><h3>${y} 年 ${m + 1} 月</h3><div class="cal">${cal}</div></div>
     <div class="card"><h3>最近记录</h3>
       ${recent.length ? recent.map(r => `
         <div class="rec">
-          <div class="ri"><b>${esc(r.planTitle)}</b><span>${r.date} · ${r.minutes} 分钟 · ${r.doneCount}/${r.total} 动作</span></div>
-          <b style="color:var(--accent);font-size:13px">${r.kcal} 千卡</b>
-          <span class="del" data-del="${r.id}">删除</span>
+          <div class="ri"><b>${esc(r.planTitle)}</b><span>${esc(r.date)} · ${esc(r.minutes)} 分钟 · ${esc(r.doneCount)}/${esc(r.total)} 动作</span></div>
+          <b style="color:var(--accent);font-size:13px">${esc(r.kcal)} 千卡</b>
+          <span class="del" data-del="${esc(r.id)}">删除</span>
         </div>`).join('') : '<div class="empty"><i>📝</i>还没有训练记录，去开始第一次训练吧</div>'}
     </div>
   `;
@@ -738,7 +738,7 @@ function renderMine() {
       <img src="${cover(64)}" alt="头像"/>
       <div>
         <div class="pn">${esc(profile.nickname)}</div>
-        <div class="pg">${goalTag(profile.goal)} <span style="margin-left:6px">${esc(profile.gender)} · ${profile.age} 岁</span></div>
+        <div class="pg">${goalTag(profile.goal)} <span style="margin-left:6px">${esc(profile.gender)} · ${esc(profile.age)} 岁</span></div>
       </div>
       <button class="edit-btn" id="editNick">编辑</button>
     </div>
@@ -749,14 +749,14 @@ function renderMine() {
           <b>${bmi.v}</b><span>BMI · ${bmi.status}</span>
         </div>
         <div style="flex:1">
-          <p class="muted">身高 ${profile.height} cm · 体重 ${profile.weight} kg · 目标 ${profile.targetWeight} kg</p>
+          <p class="muted">身高 ${esc(profile.height)} cm · 体重 ${esc(profile.weight)} kg · 目标 ${esc(profile.targetWeight)} kg</p>
           <p class="muted" style="margin-top:4px">距离目标还差 ${Math.abs(+(profile.weight - profile.targetWeight).toFixed(1))} kg，${profile.weight > profile.targetWeight ? '坚持控糖+有氧' : '加强力量+蛋白质'} 💪</p>
         </div>
       </div>
-      <div class="bmi-row" id="rowAge"><span class="bl">年龄</span><span class="bv">${profile.age} 岁</span></div>
-      <div class="bmi-row" id="rowH"><span class="bl">身高</span><span class="bv">${profile.height} cm</span></div>
-      <div class="bmi-row" id="rowW"><span class="bl">体重</span><span class="bv">${profile.weight} kg</span></div>
-      <div class="bmi-row" id="rowTW"><span class="bl">目标体重</span><span class="bv">${profile.targetWeight} kg</span></div>
+      <div class="bmi-row" id="rowAge"><span class="bl">年龄</span><span class="bv">${esc(profile.age)} 岁</span></div>
+      <div class="bmi-row" id="rowH"><span class="bl">身高</span><span class="bv">${esc(profile.height)} cm</span></div>
+      <div class="bmi-row" id="rowW"><span class="bl">体重</span><span class="bv">${esc(profile.weight)} kg</span></div>
+      <div class="bmi-row" id="rowTW"><span class="bl">目标体重</span><span class="bv">${esc(profile.targetWeight)} kg</span></div>
     </div>
     <div class="card">
       <h3>健身目标</h3>
