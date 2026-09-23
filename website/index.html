@@ -11,16 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <link rel="apple-touch-icon" href="icon.svg" />
   <title>轻练 · 合理健身</title>
-  <script>
-    // 防止深色模式闪烁：在 CSS 加载前就应用主题
-    (function() {
-      try {
-        var t = JSON.parse(localStorage.getItem('ql_theme')) || 'auto';
-        var dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-      } catch(e) { document.documentElement.dataset.theme = 'light'; }
-    })();
-  </script>
+  <script src="theme-init.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -32,7 +23,7 @@
     </div>
     <div style="width:100%;max-width:320px">
       <input id="gateUser" placeholder="用户名（3-20位字母数字）" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--border,#ddd);border-radius:12px;font-size:15px;margin-bottom:10px;background:var(--card,#fff);color:var(--text,#333)" />
-      <input id="gatePass" type="password" placeholder="密码（至少6位）" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--border,#ddd);border-radius:12px;font-size:15px;margin-bottom:14px;background:var(--card,#fff);color:var(--text,#333)" />
+      <input id="gatePass" type="password" placeholder="密码（6-128位）" maxlength="128" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--border,#ddd);border-radius:12px;font-size:15px;margin-bottom:14px;background:var(--card,#fff);color:var(--text,#333)" />
       <div style="display:flex;gap:10px">
         <button id="gateLoginBtn" style="flex:1;padding:13px;border:none;border-radius:12px;font-size:15px;font-weight:600;background:#00b578;color:#fff;cursor:pointer">登录</button>
         <button id="gateRegBtn" style="flex:1;padding:13px;border:none;border-radius:12px;font-size:15px;font-weight:600;background:var(--card,#fff);color:var(--text,#333);border:1px solid var(--border,#ddd);cursor:pointer">注册</button>
@@ -50,10 +41,6 @@
   </nav>
   <div id="toast"></div>
   <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-    }
-  </script>
+  <script src="register-sw.js"></script>
 </body>
 </html>

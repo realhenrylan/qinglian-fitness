@@ -248,6 +248,7 @@ async function doAuth(mode) {
   if (!u || !p) { toast('请输入用户名和密码'); return; }
   if (!/^[a-zA-Z0-9_]{3,20}$/.test(u)) { toast('用户名需3-20位字母/数字/下划线'); return; }
   if (p.length < 6) { toast('密码至少6位'); return; }
+  if (p.length > 128) { toast('密码不能超过128位'); return; }
   const btn = $('#authBtn'); if (btn) { btn.disabled = true; btn.textContent = '请稍候…'; }
   try {
     const r = await api('POST', mode === 'reg' ? '/api/register' : '/api/login', { username: u, password: p });
@@ -628,7 +629,7 @@ function openDietAdd(meal) {
     $('#faList', sub).innerHTML = list.length ? list.map(f => {
       const s = servings[f.id] || 1;
       return `<div class="food-item">
-        <img src="${cover(f.cover)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"/>
+        <img src="${cover(f.cover)}" alt="" loading="lazy"/>
         <div class="fi"><b>${esc(f.name)}</b><span>${esc(f.unit)}</span><span style="color:var(--accent)">${f.kcal}千卡/份</span></div>
         <div class="stepper">
           <button class="minus" data-id="${f.id}" data-d="-1">−</button><b>${s}</b><button data-id="${f.id}" data-d="1">＋</button>
@@ -636,7 +637,8 @@ function openDietAdd(meal) {
         <button class="add-btn" data-add="${f.id}">添加</button>
       </div>`;
     }).join('') : '<div class="empty"><i>🍽️</i>没有找到相关食物</div>';
-    $$('.stepper button', sub).forEach(b => b.addEventListener('click', () => {
+    $('.food-item img', sub).forEach(img => img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true }));
+    $('.stepper button', sub).forEach(b => b.addEventListener('click', () => {
       const id = b.dataset.id;
       servings[id] = Math.max(1, Math.min(9, (servings[id] || 1) + (+b.dataset.d)));
       drawList();
@@ -788,7 +790,7 @@ function renderMine() {
         <p class="muted" style="margin-top:10px">训练记录、饮食数据、身体档案将同步到服务器，换设备登录同一账号即可恢复。</p>
       ` : `
         <input id="authUser" placeholder="用户名（3-20位字母数字）" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:8px"/>
-        <input id="authPass" type="password" placeholder="密码（至少6位）" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px"/>
+        <input id="authPass" type="password" placeholder="密码（6-128位）" maxlength="128" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px"/>
         <div style="display:flex;gap:8px">
           <span class="chip" id="authBtn" style="flex:1;text-align:center">登录</span>
           <span class="chip" id="authBtnReg" style="flex:1;text-align:center">注册新账号</span>
@@ -856,6 +858,7 @@ async function gateAuth(mode) {
   if (!u || !p) { toast('请输入用户名和密码'); return; }
   if (!/^[a-zA-Z0-9_]{3,20}$/.test(u)) { toast('用户名需3-20位字母/数字/下划线'); return; }
   if (p.length < 6) { toast('密码至少6位'); return; }
+  if (p.length > 128) { toast('密码不能超过128位'); return; }
   const loginBtn = $('#gateLoginBtn'), regBtn = $('#gateRegBtn');
   loginBtn.disabled = regBtn.disabled = true;
   loginBtn.textContent = '请稍候…';

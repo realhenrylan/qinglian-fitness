@@ -203,3 +203,46 @@ test('PostgreSQL logout revokes the requested token', async () => {
   assert.deepEqual(response.body, { ok: true });
   assert.equal(tokens.has(token), false);
 });
+
+test('registration rejects passwords longer than the supported maximum', async () => {
+  const { routes, memoryFs, appPath } = loadBackendWithMemoryStorage();
+  const response = makeResponse();
+
+  await routes.get('POST /api/register')({
+    body: { username: 'alice', password: 'a'.repeat(129) },
+    headers: {}
+  }, response);
+
+  assert.equal(response.body.ok, false);
+  assert.match(response.body.msg, /128/);
+  const userFile = path.join(path.dirname(appPath), 'data', 'users.json');
+  assert.equal(memoryFs.files.has(userFile), false);
+});
+
+test('data sync accepts the client schema and rejects unexpected fields', async () => {
+  const { routes } = loadBackendWithMemoryStorage();
+  const token = await registerAccount(routes);
+  const request = body => ({
+    headers: { authorization: `Bearer ${token}` },
+    body
+  });
+  const validResponse = makeResponse();
+  await routes.get('PUT /api/data')(request({
+    v: 1,
+    profile: { nickname: 'Alice', gender: '女', age: 28, goal: '增肌', height: 168, weight: 61, targetWeight: 58 },
+    records: [{ id: 'workout-1', planTitle: '力量训练', date: '2026-09-23', minutes: 30, kcal: 200, doneCount: 5, total: 6 }],
+    dietEntries: [{ id: 'food-1', date: '2026-09-23', meal: '午餐', foodId: 'f1', foodName: '米饭', servings: 1, kcal: 232, protein: 5.2, carb: 52, fat: 0.6 }],
+    waterMap: { '2026-09-23': 4 },
+    theme: 'dark'
+  }), validResponse);
+  assert.equal(validResponse.body.ok, true);
+
+  const invalidResponse = makeResponse();
+  await routes.get('PUT /api/data')(request(JSON.parse('{"profile":{"nickname":"Alice","__proto__":{"admin":true}}}')), invalidResponse);
+  assert.equal(invalidResponse.statusCode, 400);
+  assert.equal(invalidResponse.body.ok, false);
+
+  const arrayResponse = makeResponse();
+  await routes.get('PUT /api/data')(request([]), arrayResponse);
+  assert.equal(arrayResponse.statusCode, 400);
+});

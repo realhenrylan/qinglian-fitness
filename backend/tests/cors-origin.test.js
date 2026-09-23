@@ -48,6 +48,10 @@ test('CORS allows same-origin requests and blocks unrelated origins', () => {
   }, sameOrigin, () => { sameOriginContinued = true; });
 
   assert.equal(sameOrigin.headers['Access-Control-Allow-Origin'], 'https://fitness.example');
+  assert.equal(sameOrigin.headers['Cache-Control'], 'private, no-store');
+  assert.equal(sameOrigin.headers['X-Content-Type-Options'], 'nosniff');
+  assert.equal(sameOrigin.headers['X-Frame-Options'], 'DENY');
+  assert.equal(sameOrigin.headers['Referrer-Policy'], 'strict-origin-when-cross-origin');
   assert.equal(sameOriginContinued, true);
 
   const attacker = makeResponse();
