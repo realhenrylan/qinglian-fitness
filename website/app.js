@@ -184,6 +184,13 @@ async function api(method, path, body) {
     headers: Object.assign({ 'Content-Type': 'application/json' }, auth.token ? { Authorization: 'Bearer ' + auth.token } : {}),
     body: body ? JSON.stringify(body) : undefined
   });
+  if (res.status === 401 && auth.token) {
+    auth = { token: '', username: '', apiBase: auth.apiBase };
+    store.set('auth', auth);
+    toast('登录已过期，请重新登录');
+    renderMine();
+    return { ok: false, msg: '未登录' };
+  }
   return res.json();
 }
 function syncCollect() {
@@ -198,36 +205,43 @@ function syncApply(data) {
   if (data.theme) { theme = data.theme; applyTheme(); }
 }
 async function cloudUpload() {
+  if (!auth.token) { toast('请先登录'); return; }
+  const btn = $('#cloudUploadBtn'); if (btn) { btn.disabled = true; btn.textContent = '上传中…'; }
   try {
-    toast('正在上传…');
     const r = await api('PUT', '/api/data', syncCollect());
     if (r.ok) { toast('已上传到云端 ☁️'); renderMine(); }
-    else toast(r.msg || '上传失败');
-  } catch (e) { toast('连接失败，请检查后端地址'); }
+    else if (!r.ok && r.msg !== '未登录') toast(r.msg || '上传失败');
+  } catch (e) { toast('网络连接失败'); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = '☁️ 上传到云端'; } }
 }
 async function cloudDownload() {
+  if (!auth.token) { toast('请先登录'); return; }
+  const btn = $('#cloudDownloadBtn'); if (btn) { btn.disabled = true; btn.textContent = '恢复中…'; }
   try {
-    toast('正在恢复…');
     const r = await api('GET', '/api/data');
     if (r.ok) {
-      if (!r.data || Object.keys(r.data).length === 0) { toast('云端暂无数据'); return; }
-      syncApply(r.data); renderMine(); toast('已从云端恢复 ✅');
-    } else { auth.token = ''; store.set('auth', auth); renderMine(); toast(r.msg || '登录已过期，请重新登录'); }
-  } catch (e) { toast('连接失败，请检查后端地址'); }
+      if (!r.data || Object.keys(r.data).length === 0) { toast('云端暂无数据'); }
+      else { syncApply(r.data); renderMine(); toast('已从云端恢复 ✅'); }
+    }
+  } catch (e) { toast('网络连接失败'); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = '⬇️ 从云端恢复'; } }
 }
 async function doAuth(mode) {
   const u = $('#authUser').value.trim(), p = $('#authPass').value;
   if (!u || !p) { toast('请输入用户名和密码'); return; }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(u)) { toast('用户名需3-20位字母/数字/下划线'); return; }
+  if (p.length < 6) { toast('密码至少6位'); return; }
+  const btn = $('#authBtn'); if (btn) { btn.disabled = true; btn.textContent = '请稍候…'; }
   try {
     const r = await api('POST', mode === 'reg' ? '/api/register' : '/api/login', { username: u, password: p });
     if (r.ok) {
       auth = { token: r.token, username: r.username, apiBase: auth.apiBase };
       store.set('auth', auth); toast(mode === 'reg' ? '注册成功 🎉' : '登录成功，' + r.username);
       renderMine();
-      // 登录后若本地无数据且云端有，自动恢复
       if (records.length === 0 && dietEntries.length === 0) cloudDownload();
     } else toast(r.msg || '操作失败');
-  } catch (e) { toast('连接失败，请检查后端地址'); }
+  } catch (e) { toast('网络连接失败'); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = mode === 'reg' ? '注册' : '登录'; } }
 }
 function doLogout() {
   auth = { token: '', username: '', apiBase: auth.apiBase };
@@ -740,8 +754,8 @@ function renderMine() {
       ${auth.token ? `
         <p style="margin:4px 0 10px">👤 <b>${esc(auth.username)}</b> <span class="muted">· 已登录</span></p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span class="chip" id="btnUp">☁️ 上传到云端</span>
-          <span class="chip" id="btnDown">⬇️ 从云端恢复</span>
+          <span class="chip" id="cloudUploadBtn">☁️ 上传到云端</span>
+          <span class="chip" id="cloudDownloadBtn">⬇️ 从云端恢复</span>
           <span class="chip" id="btnOut">退出登录</span>
         </div>
         <p class="muted" style="margin-top:10px">训练记录、饮食数据、身体档案将同步到服务器，换设备登录同一账号即可恢复。</p>
@@ -749,8 +763,8 @@ function renderMine() {
         <input id="authUser" placeholder="用户名（3-20位字母数字）" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:8px"/>
         <input id="authPass" type="password" placeholder="密码（至少6位）" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px"/>
         <div style="display:flex;gap:8px">
-          <span class="chip" id="btnLogin" style="flex:1;text-align:center">登录</span>
-          <span class="chip" id="btnReg" style="flex:1;text-align:center">注册新账号</span>
+          <span class="chip" id="authBtn" style="flex:1;text-align:center">登录</span>
+          <span class="chip" id="authBtnReg" style="flex:1;text-align:center">注册新账号</span>
         </div>
         <p class="muted" style="margin-top:10px">注册后数据可云同步：换手机、换浏览器登录同一账号即可恢复全部记录。</p>
       `}
@@ -760,7 +774,7 @@ function renderMine() {
     </div>
     <div class="card">
       <h3>关于轻练</h3>
-      <p class="muted">轻练 · 合理健身网站版 v2.0</p>
+      <p class="muted">轻练 · 合理健身网站版 v1.1.0</p>
       <p class="muted" style="margin-top:4px">数据默认保存在本机浏览器；登录账号后可云同步到服务器，随时换设备恢复。</p>
     </div>
   `;
@@ -774,12 +788,12 @@ function renderMine() {
   }));
   $$('#app [data-theme]').forEach(el => el.addEventListener('click', () => { setTheme(el.dataset.theme); renderMine(); }));
   if (auth.token) {
-    $('#btnUp').addEventListener('click', cloudUpload);
-    $('#btnDown').addEventListener('click', cloudDownload);
+    $('#cloudUploadBtn').addEventListener('click', cloudUpload);
+    $('#cloudDownloadBtn').addEventListener('click', cloudDownload);
     $('#btnOut').addEventListener('click', doLogout);
   } else {
-    $('#btnLogin').addEventListener('click', () => doAuth('login'));
-    $('#btnReg').addEventListener('click', () => doAuth('reg'));
+    $('#authBtn').addEventListener('click', () => doAuth('login'));
+    $('#authBtnReg').addEventListener('click', () => doAuth('reg'));
     $('#authPass').addEventListener('keydown', e => { if (e.key === 'Enter') doAuth('login'); });
   }
 }
