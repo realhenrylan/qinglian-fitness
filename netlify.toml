@@ -1,0 +1,17 @@
+[build]
+  functions = "backend/netlify/functions"
+  publish = "website"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["pg", "express", "serverless-http"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -173,8 +173,8 @@ const saveWater = () => store.set('waterMap', waterMap);
 // API 地址：同源优先（后端托管网页时），否则默认本地后端
 let auth = store.get('auth', null); // {token, username, apiBase}
 if (!auth || !auth.apiBase) {
-  const base = location.origin && location.origin.startsWith('http') && location.port === '3000'
-    ? location.origin : 'http://localhost:3000';
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const base = isLocal ? 'http://localhost:3000' : '';
   auth = { token: (auth && auth.token) || '', username: (auth && auth.username) || '', apiBase: base };
   if (auth.token) store.set('auth', auth);
 }
