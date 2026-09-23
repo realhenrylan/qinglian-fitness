@@ -1,9 +1,10 @@
-/* 轻练 Service Worker：缓存优先，支持离线使用 */
-const CACHE = 'qinglian-v3';
+/* 轻练 Service Worker：网络优先，离线回退缓存 */
+const CACHE = 'qinglian-v4';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
 });
 
 self.addEventListener('activate', (e) => {
@@ -12,20 +13,18 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// 网络优先：有网时从服务器取最新版本，断网时回退缓存
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      const fetched = fetch(e.request)
-        .then((res) => {
-          if (res && res.status === 200 && e.request.url.startsWith(self.location.origin)) {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(e.request, copy));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fetched;
-    })
+    fetch(e.request)
+      .then((res) => {
+        if (res && res.status === 200 && e.request.url.startsWith(self.location.origin)) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(e.request).then((cached) => cached || new Response('离线', { status: 503 })))
   );
 });
