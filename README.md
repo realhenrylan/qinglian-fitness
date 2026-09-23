@@ -65,9 +65,12 @@ cd website && npx serve .
 |------|------|------|
 | POST | /api/register | 注册（用户名 3-20 位字母/数字/下划线，密码 ≥ 6 位） |
 | POST | /api/login | 登录（返回 Bearer Token） |
+| POST | /api/logout | 注销当前 Bearer Token |
 | GET | /api/data | 下载云端数据（需认证） |
 | PUT | /api/data | 上传数据到云端（需认证） |
 | GET | /api/health | 健康检查 |
+
+登录令牌有效期为 7 天，过期后需要重新登录。
 
 ## License
 

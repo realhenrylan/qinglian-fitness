@@ -7,6 +7,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const USE_PG = !!process.env.DATABASE_URL;
+const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 let pool = null;
 if (USE_PG) {
   const { Pool } = require('pg');
@@ -96,16 +97,59 @@ const dbTokens = {
     }
     await pool.query(
       `INSERT INTO tokens(token,username,created_at) VALUES($1,$2,$3)
-       ON CONFLICT (token) DO UPDATE SET username=$2`,
+       ON CONFLICT (token) DO NOTHING`,
       [token, username, Date.now()]);
+  },
+  async delete(token) {
+    if (!USE_PG) {
+      const tokens = readJSON(TOKENS_FILE, {});
+      if (Object.prototype.hasOwnProperty.call(tokens, token)) {
+        delete tokens[token];
+        writeJSON(TOKENS_FILE, tokens);
+      }
+      return;
+    }
+    await pool.query('DELETE FROM tokens WHERE token=$1', [token]);
+  },
+  async deleteExpired() {
+    const cutoff = Date.now() - TOKEN_TTL_MS;
+    if (!USE_PG) {
+      const tokens = readJSON(TOKENS_FILE, {});
+      let changed = false;
+      for (const [token, session] of Object.entries(tokens)) {
+        const createdAt = Number(session && session.createdAt);
+        if (!Number.isFinite(createdAt) || createdAt <= cutoff) {
+          delete tokens[token];
+          changed = true;
+        }
+      }
+      if (changed) writeJSON(TOKENS_FILE, tokens);
+      return;
+    }
+    await pool.query('DELETE FROM tokens WHERE created_at <= $1', [cutoff]);
   },
   async get(token) {
     if (!USE_PG) {
       const tokens = readJSON(TOKENS_FILE, {});
-      return tokens[token] ? tokens[token].username : null;
+      const session = tokens[token];
+      if (!session) return null;
+      const createdAt = Number(session.createdAt);
+      if (!Number.isFinite(createdAt) || createdAt <= Date.now() - TOKEN_TTL_MS) {
+        delete tokens[token];
+        writeJSON(TOKENS_FILE, tokens);
+        return null;
+      }
+      return session.username;
     }
-    const r = await pool.query('SELECT username FROM tokens WHERE token=$1', [token]);
-    return r.rows[0] ? r.rows[0].username : null;
+    const r = await pool.query('SELECT username, created_at FROM tokens WHERE token=$1', [token]);
+    const session = r.rows[0];
+    if (!session) return null;
+    const createdAt = Number(session.created_at);
+    if (!Number.isFinite(createdAt) || createdAt <= Date.now() - TOKEN_TTL_MS) {
+      await dbTokens.delete(token);
+      return null;
+    }
+    return session.username;
   }
 };
 const dbData = {
@@ -139,10 +183,19 @@ function hashPassword(password, salt) {
   return crypto.scryptSync(String(password), salt, 32).toString('hex');
 }
 async function authUser(req) {
-  const h = req.headers.authorization || '';
-  const token = h.startsWith('Bearer ') ? h.slice(7) : '';
+  const token = bearerToken(req);
   if (!token) return null;
   return dbTokens.get(token);
+}
+function bearerToken(req) {
+  const h = req.headers.authorization || '';
+  return h.startsWith('Bearer ') ? h.slice(7) : '';
+}
+async function issueToken(username) {
+  await dbTokens.deleteExpired();
+  const token = crypto.randomBytes(32).toString('hex');
+  await dbTokens.set(token, username);
+  return token;
 }
 
 // ---------- 接口 ----------
@@ -156,8 +209,7 @@ app.post('/api/register', async (req, res) => {
     const salt = crypto.randomBytes(16).toString('hex');
     const created = await dbUsers.set(username, salt, hashPassword(password, salt));
     if (!created) return res.status(409).json({ ok: false, msg: '用户名已存在' });
-    const token = crypto.randomBytes(32).toString('hex');
-    await dbTokens.set(token, username);
+    const token = await issueToken(username);
     res.json({ ok: true, token, username });
   } catch (e) { res.json({ ok: false, msg: '服务器错误' }); }
 });
@@ -169,10 +221,17 @@ app.post('/api/login', async (req, res) => {
     if (!u || u.hash !== hashPassword(password || '', u.salt)) {
       return res.json({ ok: false, msg: '用户名或密码错误' });
     }
-    const token = crypto.randomBytes(32).toString('hex');
-    await dbTokens.set(token, username);
+    const token = await issueToken(username);
     res.json({ ok: true, token, username });
   } catch (e) { res.json({ ok: false, msg: '服务器错误' }); }
+});
+
+app.post('/api/logout', async (req, res) => {
+  try {
+    const token = bearerToken(req);
+    if (token) await dbTokens.delete(token);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ ok: false, msg: '服务器错误' }); }
 });
 
 app.get('/api/data', async (req, res) => {

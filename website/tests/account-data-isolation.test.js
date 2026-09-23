@@ -69,6 +69,23 @@ test('logging out clears account data but preserves the device theme preference'
   assert.deepEqual(storedValue(stored, 'auth'), { token: '', username: '', apiBase: '' });
 });
 
+test('logging out asks the server to revoke the active token', () => {
+  let logoutRequest;
+  const { context, stored } = createAppRuntime((url, options) => {
+    logoutRequest = { url, options };
+    return Promise.reject(new Error('offline'));
+  });
+  vm.runInContext("auth = { token: 'active-token', username: 'alice', apiBase: 'https://api.example' }", context);
+
+  vm.runInContext('doLogout()', context);
+
+  assert.equal(logoutRequest.url, 'https://api.example/api/logout');
+  assert.equal(logoutRequest.options.method, 'POST');
+  assert.equal(logoutRequest.options.headers.Authorization, 'Bearer active-token');
+  assert.equal(logoutRequest.options.keepalive, true);
+  assertAccountDataIsCleared(stored);
+});
+
 test('an expired API token clears account data before showing the login gate', async () => {
   const { context, stored } = createAppRuntime(async () => ({ status: 401, json: async () => ({}) }));
   vm.runInContext("auth = { token: 'expired', username: 'alice', apiBase: '' }", context);

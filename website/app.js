@@ -261,6 +261,14 @@ async function doAuth(mode) {
   finally { if (btn) { btn.disabled = false; btn.textContent = mode === 'reg' ? '注册' : '登录'; } }
 }
 function doLogout() {
+  const token = auth.token;
+  if (token) {
+    fetch(auth.apiBase + '/api/logout', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+      keepalive: true
+    }).catch(() => {});
+  }
   auth = { token: '', username: '', apiBase: auth.apiBase };
   store.set('auth', auth);
   clearAccountData();
