@@ -1,4 +1,5 @@
 [build]
+  command = "npm install --prefix backend"
   functions = "backend/netlify/functions"
   publish = "website"
 
