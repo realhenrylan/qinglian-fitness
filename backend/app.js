@@ -57,14 +57,16 @@ const dbUsers = {
   async set(username, salt, hash) {
     if (!USE_PG) {
       const users = readJSON(USERS_FILE, {});
+      if (Object.prototype.hasOwnProperty.call(users, username)) return false;
       users[username] = { salt, hash, createdAt: Date.now() };
       writeJSON(USERS_FILE, users);
-      return;
+      return true;
     }
-    await pool.query(
+    const result = await pool.query(
       `INSERT INTO users(username,salt,hash,created_at) VALUES($1,$2,$3,$4)
-       ON CONFLICT (username) DO UPDATE SET salt=$2, hash=$3`,
+       ON CONFLICT (username) DO NOTHING RETURNING username`,
       [username, salt, hash, Date.now()]);
+    return result.rowCount === 1;
   }
 };
 const dbTokens = {
@@ -133,9 +135,10 @@ app.post('/api/register', async (req, res) => {
     if (!username || !password) return res.json({ ok: false, msg: '用户名和密码不能为空' });
     if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return res.json({ ok: false, msg: '用户名需为3-20位字母/数字/下划线' });
     if (String(password).length < 6) return res.json({ ok: false, msg: '密码至少6位' });
-    if (await dbUsers.get(username)) return res.json({ ok: false, msg: '用户名已存在' });
+    if (await dbUsers.get(username)) return res.status(409).json({ ok: false, msg: '用户名已存在' });
     const salt = crypto.randomBytes(16).toString('hex');
-    await dbUsers.set(username, salt, hashPassword(password, salt));
+    const created = await dbUsers.set(username, salt, hashPassword(password, salt));
+    if (!created) return res.status(409).json({ ok: false, msg: '用户名已存在' });
     const token = crypto.randomBytes(32).toString('hex');
     await dbTokens.set(token, username);
     res.json({ ok: true, token, username });
