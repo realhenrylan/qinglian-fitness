@@ -1,5 +1,5 @@
 /* 轻练 Service Worker：网络优先，离线回退缓存 */
-const CACHE = 'qinglian-v4';
+const CACHE = 'qinglian-v5';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (e) => {
@@ -15,7 +15,10 @@ self.addEventListener('activate', (e) => {
 
 // 网络优先：有网时从服务器取最新版本，断网时回退缓存
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.pathname === '/api' || url.pathname.startsWith('/api/')) return;
+  if (e.request.headers && e.request.headers.has('Authorization')) return;
   e.respondWith(
     fetch(e.request)
       .then((res) => {
