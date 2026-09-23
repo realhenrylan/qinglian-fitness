@@ -191,12 +191,14 @@ if (!auth || !auth.apiBase) {
   if (auth.token) store.set('auth', auth);
 }
 async function api(method, path, body) {
+  const requestToken = auth.token;
   const res = await fetch(auth.apiBase + path, {
     method,
-    headers: Object.assign({ 'Content-Type': 'application/json' }, auth.token ? { Authorization: 'Bearer ' + auth.token } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, requestToken ? { Authorization: 'Bearer ' + requestToken } : {}),
     body: body ? JSON.stringify(body) : undefined
   });
-  if (res.status === 401 && auth.token) {
+  if (requestToken && auth.token !== requestToken) return { ok: false, msg: '登录状态已变化' };
+  if (res.status === 401 && requestToken) {
     auth = { token: '', username: '', apiBase: auth.apiBase };
     store.set('auth', auth);
     clearAccountData();
@@ -230,10 +232,11 @@ async function cloudUpload() {
 }
 async function cloudDownload() {
   if (!auth.token) { toast('请先登录'); return; }
+  const requestToken = auth.token;
   const btn = $('#cloudDownloadBtn'); if (btn) { btn.disabled = true; btn.textContent = '恢复中…'; }
   try {
     const r = await api('GET', '/api/data');
-    if (r.ok) {
+    if (r.ok && auth.token === requestToken) {
       if (!r.data || Object.keys(r.data).length === 0) { toast('云端暂无数据'); }
       else { syncApply(r.data); renderMine(); toast('已从云端恢复 ✅'); }
     }

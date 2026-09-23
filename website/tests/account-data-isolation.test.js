@@ -78,3 +78,34 @@ test('an expired API token clears account data before showing the login gate', a
   assertAccountDataIsCleared(stored);
   assert.deepEqual(storedValue(stored, 'auth'), { token: '', username: '', apiBase: '' });
 });
+
+test('a cloud download response from the previous session cannot restore data after logout', async () => {
+  let resolveResponse;
+  let signalRequestStarted;
+  const requestStarted = new Promise(resolve => { signalRequestStarted = resolve; });
+  const responsePromise = new Promise(resolve => { resolveResponse = resolve; });
+  const { context, stored } = createAppRuntime(() => {
+    signalRequestStarted();
+    return responsePromise;
+  });
+  vm.runInContext("auth = { token: 'old-session', username: 'alice', apiBase: '' }", context);
+
+  const pendingDownload = vm.runInContext('cloudDownload()', context);
+  await requestStarted;
+  vm.runInContext('doLogout()', context);
+  resolveResponse({
+    status: 200,
+    json: async () => ({
+      ok: true,
+      data: {
+        profile: { nickname: 'Alice' },
+        records: [{ date: '2026-09-20', exercise: '旧账号训练' }],
+        dietEntries: [{ date: '2026-09-20', food: '旧账号饮食' }],
+        waterMap: { '2026-09-20': 1800 }
+      }
+    })
+  });
+  await pendingDownload;
+
+  assertAccountDataIsCleared(stored);
+});
